@@ -9,6 +9,7 @@ A web-based Employee Management System developed using Java, Spring Boot, MySQL,
 * Search employees by name
 * Update employee details
 * Delete employee records
+* Duplicate Employee ID verification – prevents adding employees with an existing ID.
 * Dashboard showing total employees
 * Dashboard showing total departments
 * Calculate average employee salary
