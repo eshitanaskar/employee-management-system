@@ -3,7 +3,9 @@ package com.employee.managementsystem.service;
 import com.employee.managementsystem.entity.Employee;
 import com.employee.managementsystem.repository.EmployeeRepository;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,42 +13,53 @@ import java.util.Optional;
 @Service
 public class EmployeeService {
 
-    private final EmployeeRepository employeeRepository;
 
-    public EmployeeService(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
+private final EmployeeRepository employeeRepository;
+
+public EmployeeService(EmployeeRepository employeeRepository) {
+    this.employeeRepository = employeeRepository;
+}
+
+// Get all employees
+public List<Employee> getAllEmployees() {
+    return employeeRepository.findAll();
+}
+
+// Get employee by ID
+public Optional<Employee> getEmployeeById(Integer id) {
+    return employeeRepository.findById(id);
+}
+
+// Add employee
+public Employee addEmployee(Employee employee) {
+
+    if (employeeRepository.existsById(employee.getId())) {
+        throw new ResponseStatusException(
+            HttpStatus.CONFLICT,
+            "Employee ID already exists!"
+        );
     }
 
-    // Get all employees
-    public List<Employee> getAllEmployees() {
-        return employeeRepository.findAll();
-    }
+    return employeeRepository.save(employee);
+}
 
-    // Get employee by ID
-    public Optional<Employee> getEmployeeById(Integer id) {
-        return employeeRepository.findById(id);
-    }
+// Update employee
+public Employee updateEmployee(Integer id, Employee updatedEmployee) {
 
-    // Add employee
-    public Employee addEmployee(Employee employee) {
-        return employeeRepository.save(employee);
-    }
+    Employee employee = employeeRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Employee not found"));
 
-    // Update employee
-    public Employee updateEmployee(Integer id, Employee updatedEmployee) {
+    employee.setName(updatedEmployee.getName());
+    employee.setDepartment(updatedEmployee.getDepartment());
+    employee.setSalary(updatedEmployee.getSalary());
 
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+    return employeeRepository.save(employee);
+}
 
-        employee.setName(updatedEmployee.getName());
-        employee.setDepartment(updatedEmployee.getDepartment());
-        employee.setSalary(updatedEmployee.getSalary());
+// Delete employee
+public void deleteEmployee(Integer id) {
+    employeeRepository.deleteById(id);
+}
 
-        return employeeRepository.save(employee);
-    }
 
-    // Delete employee
-    public void deleteEmployee(Integer id) {
-        employeeRepository.deleteById(id);
-    }
 }
